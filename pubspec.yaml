@@ -1,6 +1,6 @@
 name: ink_talk
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  signature: ^6.3.0
+  flutter_tts: ^4.2.3
 
 dev_dependencies:
   flutter_test:

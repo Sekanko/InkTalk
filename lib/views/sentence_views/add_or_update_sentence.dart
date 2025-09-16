@@ -54,43 +54,71 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.sentence != null ? "Edytuj" : "Nowe zdanie"),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
         actions: [
-          TextButton(
-            onPressed: _isButtonEnabled
-                ? () {
-                    final currentSentence = widget.sentence;
-                    final title = _titleController.text;
-                    final content = _contentController.text;
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 84, 193, 140),
+              ),
+              onPressed: _isButtonEnabled
+                  ? () {
+                      final currentSentence = widget.sentence;
+                      final title = _titleController.text;
+                      final content = _contentController.text;
 
-                    if (currentSentence == null) {
-                      _sentenceService.createSentence(title, content);
-                    } else {
-                      _sentenceService.updateSentence(
-                        currentSentence,
-                        title,
-                        content,
-                      );
+                      if (currentSentence == null) {
+                        _sentenceService.createSentence(title, content);
+                      } else {
+                        _sentenceService.updateSentence(
+                          currentSentence,
+                          title,
+                          content,
+                        );
+                      }
+                      Navigator.pop(context);
                     }
-                    Navigator.pop(context);
-                  }
-                : null,
-            child: const Text("Zapisz"),
+                  : null,
+              child: const Text(
+                "Zapisz",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          TextField(
-            controller: _titleController,
-            onChanged: (value) => _areTitleOrContnetEmpty(),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 16),
+        child: Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _titleController,
+                  onChanged: (value) => _areTitleOrContnetEmpty(),
+                  decoration: InputDecoration(
+                    labelText: 'Tytuł',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _contentController,
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  onChanged: (value) => _areTitleOrContnetEmpty(),
+                  decoration: InputDecoration(
+                    labelText: 'Treść',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ],
+            ),
           ),
-          TextField(
-            controller: _contentController,
-            keyboardType: TextInputType.multiline,
-            maxLines: null,
-            onChanged: (value) => _areTitleOrContnetEmpty(),
-          ),
-        ],
+        ),
       ),
     );
   }

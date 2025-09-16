@@ -26,7 +26,11 @@ class _SavedSentencesViewsState extends State<SavedSentencesViews> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Zapisane zdania")),
+      appBar: AppBar(
+        title: Text("Zapisane zdania"),
+        centerTitle: true,
+        backgroundColor: const Color.fromARGB(255, 62, 143, 65),
+      ),
       body: StreamBuilder(
         stream: _sentenceService.allSentences,
         builder: (context, snapshot) {
@@ -34,48 +38,59 @@ class _SavedSentencesViewsState extends State<SavedSentencesViews> {
             return const Center(child: CircularProgressIndicator());
           }
 
+          final allSentences = snapshot.data!;
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text("Brak zapisanych zdań"));
           }
+          return Padding(
+            padding: const EdgeInsets.only(top: 8.0, left: 8.0),
+            child: ListView.builder(
+              itemCount: allSentences.length + 1,
+              itemBuilder: (context, index) {
+                if (index == allSentences.length) {
+                  return const SizedBox(height: 80);
+                }
 
-          final allSentences = snapshot.data!;
-          return ListView.builder(
-            itemCount: allSentences.length,
-            itemBuilder: (context, index) {
-              final sentence = allSentences[index];
-              return ListTile(
-                title: Text(sentence.title),
-                subtitle: Text(
-                  sentence.content,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  softWrap: true,
-                ),
-                onTap: () {
-                  Navigator.pop(context, sentence.content);
-                },
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.of(
-                          context,
-                        ).pushNamed(sentenceRoute, arguments: sentence);
-                      },
-                      icon: Icon(Icons.settings),
-                      color: Colors.blue,
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        _sentenceService.deleteSentence(sentence);
-                      },
-                      icon: Icon(Icons.delete, color: Colors.red),
-                    ),
-                  ],
-                ),
-              );
-            },
+                final sentence = allSentences[index];
+                return ListTile(
+                  title: Text(
+                    sentence.title,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    softWrap: true,
+                  ),
+                  subtitle: Text(
+                    sentence.content,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    softWrap: true,
+                  ),
+                  onTap: () {
+                    Navigator.pop(context, sentence.content);
+                  },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(
+                            context,
+                          ).pushNamed(sentenceRoute, arguments: sentence);
+                        },
+                        icon: Icon(Icons.settings),
+                        color: Colors.blue,
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          _sentenceService.deleteSentence(sentence);
+                        },
+                        icon: Icon(Icons.delete, color: Colors.red),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           );
         },
       ),

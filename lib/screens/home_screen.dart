@@ -36,21 +36,42 @@ class HomeScreenState extends State<HomeScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          TextField(
-            controller: controller,
-            decoration: const InputDecoration(labelText: "Wpisz tekst"),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  decoration: const InputDecoration(
+                    labelText: "Wpisz tekst",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () async {
+                  String text = controller.text.trim();
+                  if (text.isEmpty) return;
+                  await flutterTts.speak(text);
+                },
+                child: const Text("Przeczytaj"),
+              ),
+            ],
           ),
           Wrap(
             alignment: WrapAlignment.center,
             children: [
+              ElevatedButton(
+                onPressed: () {},
+                child: const Text("Zapisane fromuły"),
+              ),
               ElevatedButton(
                 onPressed: () {
                   String text = controller.text.trim();
                   if (text.isEmpty) return;
 
                   List<String> words = text.split(" ");
-
                   words.removeLast();
+
                   text = words.join(" ");
                   controller.text = text;
                 },
@@ -61,14 +82,6 @@ class HomeScreenState extends State<HomeScreen> {
                   controller.clear();
                 },
                 child: const Text("Wyczyść"),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  String text = controller.text.trim();
-                  if (text.isEmpty) return;
-                  await flutterTts.speak(text);
-                },
-                child: const Text("Przeczytaj"),
               ),
             ],
           ),

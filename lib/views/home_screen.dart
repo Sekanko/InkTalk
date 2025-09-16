@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:ink_talk/constants.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -8,8 +9,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  final TextEditingController controller = TextEditingController();
-  final FlutterTts flutterTts = FlutterTts();
+  final TextEditingController _controller = TextEditingController();
+  final FlutterTts _flutterTts = FlutterTts();
 
   @override
   void initState() {
@@ -18,15 +19,18 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> prepareTTS() async {
-    await flutterTts.setLanguage("pl-PL");
-    await flutterTts.setPitch(1.0);
-    await flutterTts.setSpeechRate(0.5);
-    await flutterTts.setVoice({"name": "pl-pl-x-bmg-local", "locale": "pl-PL"});
+    await _flutterTts.setLanguage("pl-PL");
+    await _flutterTts.setPitch(1.0);
+    await _flutterTts.setSpeechRate(0.5);
+    await _flutterTts.setVoice({
+      "name": "pl-pl-x-bmg-local",
+      "locale": "pl-PL",
+    });
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -40,7 +44,7 @@ class HomeScreenState extends State<HomeScreen> {
             children: [
               Expanded(
                 child: TextField(
-                  controller: controller,
+                  controller: _controller,
                   decoration: const InputDecoration(
                     labelText: "Wpisz tekst",
                     border: OutlineInputBorder(),
@@ -49,9 +53,9 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  String text = controller.text.trim();
+                  String text = _controller.text.trim();
                   if (text.isEmpty) return;
-                  await flutterTts.speak(text);
+                  await _flutterTts.speak(text);
                 },
                 child: const Text("Przeczytaj"),
               ),
@@ -61,25 +65,32 @@ class HomeScreenState extends State<HomeScreen> {
             alignment: WrapAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: () {},
-                child: const Text("Zapisane fromuły"),
+                onPressed: () async {
+                  final result = await Navigator.of(
+                    context,
+                  ).pushNamed<String>(savedSentences);
+                  if (result != null) {
+                    _controller.text = result;
+                  }
+                },
+                child: const Text("Zapisane zdania"),
               ),
               ElevatedButton(
                 onPressed: () {
-                  String text = controller.text.trim();
+                  String text = _controller.text.trim();
                   if (text.isEmpty) return;
 
                   List<String> words = text.split(" ");
                   words.removeLast();
 
                   text = words.join(" ");
-                  controller.text = text;
+                  _controller.text = text;
                 },
                 child: const Text("Usuń ostatni wyraz"),
               ),
               ElevatedButton(
                 onPressed: () {
-                  controller.clear();
+                  _controller.clear();
                 },
                 child: const Text("Wyczyść"),
               ),

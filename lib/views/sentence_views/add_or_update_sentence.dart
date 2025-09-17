@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ink_talk/model/sentence.dart';
 import 'package:ink_talk/service/sentence_service.dart';
+import 'package:ink_talk/widgets/text_helper.dart';
 
 class AddOrUpdateSentence extends StatefulWidget {
   final Sentence? sentence;
@@ -15,6 +16,8 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
   late final SentenceService _sentenceService;
+  late final FocusNode _titleFocus;
+  late final FocusNode _contentFocus;
   bool _isButtonEnabled = false;
 
   @override
@@ -27,12 +30,22 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
       text: widget.sentence?.content ?? "",
     );
     _sentenceService = SentenceService();
+    _titleFocus = FocusNode();
+    _contentFocus = FocusNode();
+    _titleFocus.addListener(_onFocusChange);
+    _contentFocus.addListener(_onFocusChange);
+  }
+
+  void _onFocusChange() {
+    setState(() {});
   }
 
   @override
   void dispose() {
     _titleController.dispose();
     _contentController.dispose();
+    _titleFocus.dispose();
+    _contentFocus.dispose();
     super.dispose();
   }
 
@@ -89,35 +102,42 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 16),
-        child: Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              children: [
-                TextField(
-                  controller: _titleController,
-                  onChanged: (value) => _areTitleOrContnetEmpty(),
-                  decoration: InputDecoration(
-                    labelText: 'Tytuł',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _contentController,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  onChanged: (value) => _areTitleOrContnetEmpty(),
-                  decoration: InputDecoration(
-                    labelText: 'Treść',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(top: 16, left: 8, right: 8),
+        child: Column(
+          children: [
+            TextField(
+              focusNode: _titleFocus,
+              controller: _titleController,
+              onChanged: (value) => _areTitleOrContnetEmpty(),
+              decoration: InputDecoration(
+                labelText: 'Tytuł',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
+            const SizedBox(height: 10),
+            TextField(
+              focusNode: _contentFocus,
+              controller: _contentController,
+              keyboardType: TextInputType.multiline,
+              maxLines: null,
+              onChanged: (value) => _areTitleOrContnetEmpty(),
+              decoration: InputDecoration(
+                labelText: 'Treść',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextHelper(
+                getController: () {
+                  if (_titleFocus.hasFocus) return _titleController;
+                  if (_contentFocus.hasFocus) return _contentController;
+                  return _titleController; // fallback
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

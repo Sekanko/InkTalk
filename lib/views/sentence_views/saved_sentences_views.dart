@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ink_talk/constants.dart';
+import 'package:ink_talk/utils/constants.dart';
 import 'package:ink_talk/service/sentence_service.dart';
 
 class SavedSentencesViews extends StatefulWidget {
@@ -26,6 +26,7 @@ class _SavedSentencesViewsState extends State<SavedSentencesViews> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("Zapisane zdania"),
         centerTitle: true,

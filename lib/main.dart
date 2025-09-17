@@ -5,7 +5,7 @@ import 'package:ink_talk/views/sentence_views/add_or_update_sentence.dart';
 import 'package:ink_talk/views/sentence_views/saved_sentences_views.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:hive/hive.dart';
-import 'constants.dart';
+import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

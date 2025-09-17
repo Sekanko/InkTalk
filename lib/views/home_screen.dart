@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:ink_talk/constants.dart';
+import 'package:ink_talk/utils/constants.dart';
+import 'package:ink_talk/widgets/text_helper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,12 +10,17 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  final TextEditingController _controller = TextEditingController();
-  final FlutterTts _flutterTts = FlutterTts();
+  late final TextEditingController _controller;
+  late final FlutterTts _flutterTts;
+  late final FocusNode _textFocus;
 
   @override
   void initState() {
     super.initState();
+    _controller = TextEditingController();
+    _flutterTts = FlutterTts();
+    _textFocus = FocusNode();
+
     Future.microtask(() => prepareTTS());
   }
 
@@ -31,7 +37,15 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     _controller.dispose();
+    _textFocus.dispose();
     super.dispose();
+  }
+
+  void focusAndMoveCursorToEnd() {
+    _textFocus.requestFocus();
+    _controller.selection = TextSelection.fromPosition(
+      TextPosition(offset: _controller.text.length),
+    );
   }
 
   @override
@@ -44,6 +58,7 @@ class HomeScreenState extends State<HomeScreen> {
             children: [
               Expanded(
                 child: TextField(
+                  focusNode: _textFocus,
                   controller: _controller,
                   minLines: 3,
                   maxLines: 3,
@@ -77,6 +92,7 @@ class HomeScreenState extends State<HomeScreen> {
                         ).pushNamed<String>(savedSentences);
                         if (result != null) {
                           _controller.text = result;
+                          focusAndMoveCursorToEnd();
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -90,39 +106,7 @@ class HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  String text = _controller.text.trim();
-                  if (text.isEmpty) return;
-
-                  List<String> words = text.split(" ");
-                  words.removeLast();
-
-                  text = words.join(" ");
-                  _controller.text = text;
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 206, 38, 38),
-                  minimumSize: const Size(150, 40),
-                ),
-
-                child: const Text("Usuń ostatni wyraz"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _controller.clear();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 185, 13, 1),
-                  minimumSize: const Size(150, 40),
-                ),
-                child: const Text("Wyczyść"),
-              ),
-            ],
-          ),
+          TextHelper(getController: () => _controller),
         ],
       ),
     );

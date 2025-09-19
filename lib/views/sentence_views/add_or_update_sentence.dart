@@ -18,7 +18,7 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
   late final SentenceService _sentenceService;
   late final FocusNode _titleFocus;
   late final FocusNode _contentFocus;
-  bool _isButtonEnabled = false;
+  late bool _isButtonEnabled;
 
   @override
   void initState() {
@@ -34,10 +34,8 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
     _contentFocus = FocusNode();
     _titleFocus.addListener(_onFocusChange);
     _contentFocus.addListener(_onFocusChange);
-  }
 
-  void _onFocusChange() {
-    setState(() {});
+    _isButtonEnabled = widget.sentence != null;
   }
 
   @override
@@ -47,6 +45,10 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
     _titleFocus.dispose();
     _contentFocus.dispose();
     super.dispose();
+  }
+
+  void _onFocusChange() {
+    setState(() {});
   }
 
   void _areTitleOrContnetEmpty() {
@@ -68,6 +70,7 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
       appBar: AppBar(
         title: Text(widget.sentence != null ? "Edytuj" : "Nowe zdanie"),
         centerTitle: true,
+
         backgroundColor: Colors.blue,
         actions: [
           Padding(
@@ -75,6 +78,7 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
             child: TextButton(
               style: TextButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 84, 193, 140),
+                disabledBackgroundColor: Colors.blueGrey,
               ),
               onPressed: _isButtonEnabled
                   ? () {

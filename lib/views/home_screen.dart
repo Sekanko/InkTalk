@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:ink_talk/utils/constants.dart';
+import 'package:ink_talk/widgets/main_elevated_button.dart';
 import 'package:ink_talk/widgets/text_helper.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -48,11 +49,33 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _readCurrentText() async {
+    String text = _controller.text.trim();
+    if (text.isEmpty) return;
+    await _flutterTts.speak(text);
+  }
+
+  String _getReadButtonText() => "Przeczytaj";
+
+  void _goToSavedSentences() async {
+    final result = await Navigator.of(
+      context,
+    ).pushNamed<String>(savedSentences);
+    if (result != null) {
+      _controller.text += " $result";
+      focusAndMoveCursorToEnd();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
     return Scaffold(
+      extendBody: true,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -68,47 +91,36 @@ class HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 8, width: 16),
-              IntrinsicWidth(
-                stepWidth: 5,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        String text = _controller.text.trim();
-                        if (text.isEmpty) return;
-                        await _flutterTts.speak(text);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 33, 82, 243),
-                      ),
-                      child: const Text("Przeczytaj"),
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        final result = await Navigator.of(
-                          context,
-                        ).pushNamed<String>(savedSentences);
-                        if (result != null) {
-                          _controller.text = result;
-                          focusAndMoveCursorToEnd();
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 62, 143, 65),
-                      ),
-
-                      child: const Text("Zapisane zdania"),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
-          TextHelper(getController: () => _controller),
+          TextHelper(
+            getController: () => _controller,
+            gap: !isPortrait ? 20.0 : null,
+            children: [
+              MainElevatedButton(
+                text: "Zapisane",
+                backgroundColor: Colors.green,
+                onPressed: _goToSavedSentences,
+              ),
+              if (!isPortrait)
+                MainElevatedButton(
+                  text: _getReadButtonText(),
+                  backgroundColor: Colors.blue,
+                  onPressed: _readCurrentText,
+                ),
+            ],
+          ),
         ],
       ),
+
+      floatingActionButton: isPortrait
+          ? FloatingActionButton.extended(
+              onPressed: _readCurrentText,
+              backgroundColor: Colors.blue,
+              label: Text(_getReadButtonText()),
+            )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

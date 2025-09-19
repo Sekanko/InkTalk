@@ -78,7 +78,7 @@ class _SavedSentencesViewsState extends State<SavedSentencesViews> {
                             context,
                           ).pushNamed(sentenceRoute, arguments: sentence);
                         },
-                        icon: Icon(Icons.settings),
+                        icon: Icon(Icons.edit),
                         color: Colors.blue,
                       ),
                       IconButton(

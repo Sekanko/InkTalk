@@ -1,7 +1,9 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:ink_talk/model/sentence.dart';
 import 'package:ink_talk/service/sentence_service.dart';
-import 'package:ink_talk/widgets/text_helper.dart';
+import 'package:ink_talk/widgets/my_text_field.dart';
 
 class AddOrUpdateSentence extends StatefulWidget {
   final Sentence? sentence;
@@ -16,8 +18,6 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
   late final SentenceService _sentenceService;
-  late final FocusNode _titleFocus;
-  late final FocusNode _contentFocus;
   late bool _isButtonEnabled;
 
   @override
@@ -30,11 +30,6 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
       text: widget.sentence?.content ?? "",
     );
     _sentenceService = SentenceService();
-    _titleFocus = FocusNode();
-    _contentFocus = FocusNode();
-    _titleFocus.addListener(_onFocusChange);
-    _contentFocus.addListener(_onFocusChange);
-
     _isButtonEnabled = widget.sentence != null;
   }
 
@@ -42,13 +37,7 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
   void dispose() {
     _titleController.dispose();
     _contentController.dispose();
-    _titleFocus.dispose();
-    _contentFocus.dispose();
     super.dispose();
-  }
-
-  void _onFocusChange() {
-    setState(() {});
   }
 
   void _areTitleOrContnetEmpty() {
@@ -59,10 +48,18 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
     });
   }
 
-  // void setControllerTexts(String title, String content) {
-  //   _titleController.text = title;
-  //   _contentController.text = content;
-  // }
+  void _submit() {
+    final currentSentence = widget.sentence;
+    final title = _titleController.text;
+    final content = _contentController.text;
+
+    if (currentSentence == null) {
+      _sentenceService.createSentence(title, content);
+    } else {
+      _sentenceService.updateSentence(currentSentence, title, content);
+    }
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,24 +77,8 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
                 backgroundColor: const Color.fromARGB(255, 84, 193, 140),
                 disabledBackgroundColor: Colors.blueGrey,
               ),
-              onPressed: _isButtonEnabled
-                  ? () {
-                      final currentSentence = widget.sentence;
-                      final title = _titleController.text;
-                      final content = _contentController.text;
+              onPressed: _isButtonEnabled ? _submit : null,
 
-                      if (currentSentence == null) {
-                        _sentenceService.createSentence(title, content);
-                      } else {
-                        _sentenceService.updateSentence(
-                          currentSentence,
-                          title,
-                          content,
-                        );
-                      }
-                      Navigator.pop(context);
-                    }
-                  : null,
               child: const Text(
                 "Zapisz",
                 style: TextStyle(color: Colors.white),
@@ -106,42 +87,34 @@ class _AddOrUpdateSentenceState extends State<AddOrUpdateSentence> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(top: 16, left: 8, right: 8),
-        child: Column(
-          children: [
-            TextField(
-              focusNode: _titleFocus,
-              controller: _titleController,
-              onChanged: (value) => _areTitleOrContnetEmpty(),
-              decoration: InputDecoration(
-                labelText: 'Tytuł',
-                border: OutlineInputBorder(),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              MyTextField(
+                controller: _titleController,
+                onChanged: (value) => _areTitleOrContnetEmpty(),
+                maxLines: 1,
+                decoration: InputDecoration(
+                  labelText: 'Tytuł',
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              focusNode: _contentFocus,
-              controller: _contentController,
-              keyboardType: TextInputType.multiline,
-              maxLines: null,
-              onChanged: (value) => _areTitleOrContnetEmpty(),
-              decoration: InputDecoration(
-                labelText: 'Treść',
-                border: OutlineInputBorder(),
+              const SizedBox(height: 10),
+              Expanded(
+                child: MyTextField(
+                  controller: _contentController,
+                  onChanged: (value) => _areTitleOrContnetEmpty(),
+                  expand: true,
+                  decoration: InputDecoration(
+                    labelText: 'Treść',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextHelper(
-                getController: () {
-                  if (_titleFocus.hasFocus) return _titleController;
-                  if (_contentFocus.hasFocus) return _contentController;
-                  return _titleController; // fallback
-                },
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

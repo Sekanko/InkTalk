@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:ink_talk/utils/constants.dart';
 import 'package:ink_talk/widgets/main_elevated_button.dart';
-import 'package:ink_talk/widgets/text_helper.dart';
+import 'package:ink_talk/widgets/multiple_buttons.dart';
+import 'package:ink_talk/widgets/my_text_field.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -42,8 +44,7 @@ class HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  void focusAndMoveCursorToEnd() {
-    _textFocus.requestFocus();
+  void _moveCursorToEnd() {
     _controller.selection = TextSelection.fromPosition(
       TextPosition(offset: _controller.text.length),
     );
@@ -63,64 +64,59 @@ class HomeScreenState extends State<HomeScreen> {
     ).pushNamed<String>(savedSentences);
     if (result != null) {
       _controller.text += " $result";
-      focusAndMoveCursorToEnd();
+      _moveCursorToEnd();
     }
+    _textFocus.requestFocus();
   }
 
   @override
   Widget build(BuildContext context) {
-    final isPortrait =
-        MediaQuery.of(context).orientation == Orientation.portrait;
-
     return Scaffold(
       extendBody: true,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  focusNode: _textFocus,
-                  controller: _controller,
-                  minLines: 3,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: "Wpisz tekst",
-                    border: OutlineInputBorder(),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Listener(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: MultipleButtons(
+                    children: [
+                      MainElevatedButton(
+                        text: "Zapisane zdania",
+                        backgroundColor: Colors.green,
+                        onPressed: _goToSavedSentences,
+                      ),
+                      MainElevatedButton(
+                        text: _getReadButtonText(),
+                        backgroundColor: Colors.blueAccent,
+                        onPressed: _readCurrentText,
+                      ),
+                      MainElevatedButton(
+                        text: "Wyszyść",
+                        backgroundColor: Colors.red,
+                        onPressed: () => _controller.clear(),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
-          ),
-          TextHelper(
-            getController: () => _controller,
-            gap: !isPortrait ? 20.0 : null,
-            children: [
-              MainElevatedButton(
-                text: "Zapisane",
-                backgroundColor: Colors.green,
-                onPressed: _goToSavedSentences,
-              ),
-              if (!isPortrait)
-                MainElevatedButton(
-                  text: _getReadButtonText(),
-                  backgroundColor: Colors.blue,
-                  onPressed: _readCurrentText,
+                Expanded(
+                  child: MyTextField(
+                    focusNode: _textFocus,
+                    controller: _controller,
+                    expand: true,
+                    onTapOutside: (_) => _textFocus.requestFocus(),
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                 ),
-            ],
+              ],
+            ),
           ),
-        ],
+        ),
       ),
-
-      floatingActionButton: isPortrait
-          ? FloatingActionButton.extended(
-              onPressed: _readCurrentText,
-              backgroundColor: Colors.blue,
-              label: Text(_getReadButtonText()),
-            )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

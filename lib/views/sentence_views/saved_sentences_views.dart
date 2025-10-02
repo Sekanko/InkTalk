@@ -11,6 +11,7 @@ class SavedSentencesViews extends StatefulWidget {
 
 class _SavedSentencesViewsState extends State<SavedSentencesViews> {
   late final SentenceService _sentenceService;
+  final double _iconSize = 40;
 
   @override
   void initState() {
@@ -31,6 +32,24 @@ class _SavedSentencesViewsState extends State<SavedSentencesViews> {
         title: Text("Zapisane zdania"),
         centerTitle: true,
         backgroundColor: const Color.fromARGB(255, 62, 143, 65),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 400,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 44, 103, 239),
+                borderRadius: BorderRadius.all(Radius.circular(8)),
+              ),
+              child: IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushNamed(sentenceRoute);
+                },
+                icon: Icon(Icons.add),
+              ),
+            ),
+          ),
+        ],
       ),
       body: StreamBuilder(
         stream: _sentenceService.allSentences,
@@ -73,6 +92,7 @@ class _SavedSentencesViewsState extends State<SavedSentencesViews> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
+                        iconSize: _iconSize,
                         onPressed: () {
                           Navigator.of(
                             context,
@@ -82,6 +102,7 @@ class _SavedSentencesViewsState extends State<SavedSentencesViews> {
                         color: Colors.blue,
                       ),
                       IconButton(
+                        iconSize: _iconSize,
                         onPressed: () {
                           _sentenceService.deleteSentence(sentence);
                         },
@@ -94,12 +115,6 @@ class _SavedSentencesViewsState extends State<SavedSentencesViews> {
             ),
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.of(context).pushNamed(sentenceRoute);
-        },
-        child: Icon(Icons.add),
       ),
     );
   }

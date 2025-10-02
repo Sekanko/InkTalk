@@ -25,7 +25,14 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'InkTalk',
-      theme: ThemeData.dark(),
+
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(fontSize: 28),
+          bodyMedium: TextStyle(fontSize: 20),
+        ),
+      ),
       home: HomeScreen(),
       onGenerateRoute: (settings) {
         switch (settings.name) {
